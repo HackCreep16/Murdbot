@@ -1,0 +1,270 @@
+import json
+import aiofiles
+import os
+import requests
+import aiohttp
+import discord
+from discord.ext import commands
+import googleapiclient.discovery
+import googleapiclient.errors
+from discord.ext.commands import Bot
+
+# something
+
+prefix = "h!"
+bot = commands.Bot(command_prefix=prefix, description="Hello", case_insensitive=True)
+
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(
+        activity=discord.Streaming(name="Death", url="https://www.youtube.com/watch?v=1G-tJsFfo2I"))
+    print('I logged on as a hunter')  # idk
+
+
+# welcome
+
+@bot.event
+async def on_member_join(member):
+    await member.create_dm()
+    await member.dm_channel.send(
+        f'Greetings! {member.name}, welcome to the server!'
+    )
+
+
+# goodbye
+
+@bot.event
+async def on_member_leave(member):
+    await member.create_dm()
+    await member.dm_channel.send(
+        f'Goodbye {member.name}, sorry to see you go 3:('
+    )
+
+
+# commands
+
+# cog thing
+
+@bot.command()
+async def load(ctx, extention):
+    bot.load_extention(f'cogs.extention')
+
+
+@bot.command()
+async def unload(ctx, extention):
+    bot.unload_extention(f'cogs.extention')
+
+
+# help
+
+bot.remove_command("help")
+
+
+@bot.group()
+async def help(ctx):
+    embedVar = discord.Embed(title="Help",
+                             description="Do h!help plus the command you're lookin' for and boom, that's the info you wanted :D",
+                             color=0xfc7f03)
+
+    embedVar.add_field(name="Fun stuff", description="nothing, nothing, nothing and, nothing")
+    embedVar.add_field(name="Music", description="play, pause, rickroll, fs, save, download")
+    embedVar.add_field(name="Miscellaneous", description="Megaphone, SMegaphone, MMegaphone, About")
+
+    await ctx.send(ember=embedVar)
+
+
+@bot.command()
+async def sum(ctx, numOne: int, numTwo: int):
+    await ctx.send(numOne + numTwo)
+
+
+# not much insanity
+@bot.command()
+async def smegaphone(ctx):
+    for i in range(30):
+        await ctx.send(ctx.message.author.mention)
+
+
+# insanity
+@bot.command()
+async def megaphone(ctx):
+    for i in range(50):
+        await ctx.send(ctx.message.guild.default_role)
+
+
+# meinsanity
+@bot.command()
+async def mmegaphone(ctx):
+    await ctx.send("You'll regret this")
+    for i in range(100):
+        await ctx.send(ctx.message.guild.default_role)
+
+
+# random dog image
+@bot.command()
+async def dog(ctx):
+    async with aiohttp.ClientSession() as session:
+        request = await session.get('https://some-random-api.ml/img/dog')
+        dogjson = await request.json()
+
+        request2 = await session.get('https://some-random-api.ml/facts/dog')
+        factjson = await request2.json()
+
+    embed = discord.Embed(title="A doggo for you", color=0x91572a)
+    embed.set_image(url=dogjson['link'])
+    embed.set_footer(text='Fact: ' + factjson['fact'])
+    await ctx.send(embed=embed)
+
+
+# random cat image
+@bot.command()
+async def cat(ctx):
+    async with aiohttp.ClientSession() as session:
+        request = await session.get('https://some-random-api.ml/img/cat')
+        catjson = await request.json()
+        request2 = await session.get('https://some-random-api.ml/facts/cat')
+        factjson = await request2.json()
+
+    embed = discord.Embed(title="A catto for you", color=0xff984a)
+    embed.set_image(url=catjson['link'])
+    embed.set_footer(text='Fact: ' + factjson['fact'])
+    await ctx.send(embed=embed)
+
+
+# suicide prevention
+@bot.command()
+async def suicide(ctx):
+    embedVar = discord.Embed(title="I want you to know that you're never alone! We need you!",
+                             description="Please call your local therapist, death is never the option!", color=0xff70c3)
+    embedVar.set_thumbnail(
+        url="https://media.discordapp.net/attachments/859288134989381653/861370267007713310/59915-aleksandr-ledogorov-310150-unsplash.png")
+
+    embedVar.add_field(name="Suicide Prevention Hotlines",
+                       value="https://suicidepreventionlifeline.org/ https://www.opencounseling.com/suicide-hotlines",
+                       inline=False)
+    embedVar.add_field(name="Phone Number", value="1-800-273-8255", inline=False)
+    await ctx.send(embed=embedVar)
+
+
+@bot.command()
+async def attckrepo(ctx):
+    embedVar = discord.Embed(title="Attack on furry",
+                             description="Repository link: https://github.com/HackCreep16/Attack-on-Furry",
+                             color=0xde1e00)
+    embedVar.set_thumbnail(
+        url="https://media.discordapp.net/attachments/863373263723692052/863373750484467762/attack_on_furry_ico_2.png?width=636&height=636")
+
+    embedVar.add_field(name="You can send suggestions here!", value="Fill me up: https://forms.gle/8cNY6RpshPbFj3YD6",
+                       inline=False)
+    embedVar.add_field(name="pls don't attacc me", value="pls don't   , ahhhhhhhhhhhhh | ???https://bit.ly/3xZeV1I???")
+    await ctx.send(embed=embedVar)
+
+
+@bot.command()
+async def info(ctx):
+    embedVar = discord.Embed(title="About Murdbot", color=0xfc7f03)
+    embedVar.add_field(
+        name="Hey! It's me, the creator of Murdbot- \*cough* murder \*cough*...anyways.. Hello! It's me HackCreep16, the creator of Murdbot :D ")
+    embedVar.set_thumbnail(
+        url="https://media.discordapp.net/attachments/838345194125393930/887987173062758400/200x_5_BR_CHANGE.png")
+
+    embedVar.add_field(name="Hey! You can send suggestions here to make our bot better!",
+                       value="Fill me up: https://forms.gle/8cNY6RpshPbFj3YD6", inline=False)
+    embedVar.add_field(name="pls don't attacc me", value="pls don't \*insert mario screaming* https://bit.ly/3xZeV1I")
+    await ctx.send(embed=embedVar)
+
+
+# music
+
+@bot.command()
+async def search(ctx):
+    key = 'AIzaSyC09WrnnP-4sqO1lWfArEjDPWRwwY0uVlI'
+
+    youtube = googleapiclient.discovery.build('youtube', 'v3', key)
+
+    request = youtube.search().list(
+        part="snippet",
+        maxResults=25,
+        q="surfing"
+    )
+
+    response = request.execute()
+    print(response)
+
+    # music download
+
+
+@bot.command()
+async def download(ctx, pass_context=True):
+    video_id = '0lDnmKzUza4'
+    ftype = 'MP3'
+
+    # types: mp3 = MP3, videos = MP4, merged = WEBM / MKV
+
+    receive = requests.get('https://www.yt-download.org/api/button/MP3/0lDnmKzUza4')  # make sure to change the api link
+
+    if receive.status_code == 200:
+        filee = receive()
+        await ctx.send(filee['file'])
+    else:
+        await ctx.send(
+            "Sorry bro, the process cannot be processed, there's some kind of error, and it's kind of hidden... Can you try again later?")
+
+
+# join/leave
+@bot.command()
+async def join(ctx):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+
+
+@bot.command()
+async def leave(ctx):
+    await ctx.voice_client.disconnect()
+
+
+@bot.command()
+async def play(ctx):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+
+
+# song saving
+
+def save_song(ctx):
+    member: ctx.message.author
+    with open('saved_songs.json', 'r') as f:
+        song = json.load(f)
+        song[str(member.id)] += 1
+
+        with open('saved_songs.json', 'w') as f:
+            json.dump(song, f)
+
+
+def remove_song(ctx, member: discord.Member, amount=int):
+    with open('saved_songs.json', 'r') as f:
+        song = json.load(f)
+        song[str(member.id)] -= amount
+
+    with open('saved_songs.json', 'w') as f:
+        json.dump(song, f)
+
+
+@bot.command()
+async def save(ctx, member: discord.Member, *, song):
+    save_song(ctx, member)
+
+
+@bot.command()
+async def savedsongs(ctx, member: discord.Member, *, song):
+    save_song(ctx, member)
+
+# end
+
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        bot.load_extention(f'cogs.filename[:-3]')
+
+# e | Run
+bot.run('ODYxMjY0Nzg3OTE2MzI0ODY1.YOHRVg.ZRqO__QJiiRTf9N8CM9a1ZpIQLM')
