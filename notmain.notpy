@@ -267,4 +267,4 @@ for filename in os.listdir('./cogs'):
         bot.load_extention(f'cogs.filename[:-3]')
 
 # e | Run
-bot.run('ODYxMjY0Nzg3OTE2MzI0ODY1.YOHRVg.ZRqO__QJiiRTf9N8CM9a1ZpIQLM')
+bot.run('the token')
