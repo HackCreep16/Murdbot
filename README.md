@@ -9,6 +9,3 @@ Make sure you're running python 3.6.5 or your computer will explode.
 
 ```pip install -r requirements. txt```
 
-#
-
-![Murdbot icon, idk](Icon_murd/200x 6 TH BR CHANGE.png)
